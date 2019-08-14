@@ -63,9 +63,9 @@ void DelFirst()
 		Start=Start->next;
 		free(Node);
 		//cout<<0<<endl;
-	}
-	else
-		//cout<<-1<<endl;
+	}	
+	else	
+	cout<<-1<<endl;
 }
 
 void Del(int x,int y)
@@ -80,7 +80,7 @@ void Del(int x,int y)
 				Start=Node->next;
 			else Prev->next=Node->next;
 			free(Node);
-			cout<<0<<endl;
+			//cout<<0<<endl;
 			return;
 		}
 		Prev=Node;
@@ -94,32 +94,33 @@ void Search(float d)
 	//vector<pair<int,int>> v;
 	struct N *Node=Start;
 	//cout<<d<<'D';
-	int f=1;
+	int f=0;
 	double D=d*d;
 	while(Node!=NULL)
 	{
 		//double t=Node->x*Node->x+Node->y*Node->y;
 		if(Node->p.distance()<=D)
-			{ Node->p.show(); f=0;}
+			{f++;}
 		Node=Node->next;
 	}
 	if(f)
-		cout<<-1;
+		cout<<f;
+	else cout<<f-1;
 	cout<<endl;
 }
 
 
-void Search(int x,int y)
+bool Search(int x,int y)
 {
 	struct N *Node=Start;
 	int c=0;
 	while(Node!=NULL)
 	{
 		if(Node->p.compare(x,y))
-			c++;
+			return true;
 		Node=Node->next;
 	}
-	cout<<c<<endl;
+	return false;
 }
 
 void Length()
