@@ -22,7 +22,7 @@ int main()
 		}
 		if(a.size()==1&&a[0]==1)
 		{
-			cout<<endl<<"Not a Prime";
+			cout<<"Not a Prime"<<endl;
 			continue;
 		}
 		int d;
