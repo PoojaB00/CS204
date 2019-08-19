@@ -4,11 +4,11 @@ using namespace std;
 
 struct tree 
 {
-    int i;
+    long long i;
     tree * left,* right,* parent;
 };
 
-int prec(char c) 
+long long prec(char c) 
 { 
     if(c == '^') 
     return 3; 
@@ -27,7 +27,7 @@ bool isop(char c)
     return false;
 }
 
-int mapo(char c)
+long long mapo(char c)
 {
     switch(c)
     {
@@ -39,12 +39,12 @@ int mapo(char c)
     }
 }
 
-stack<int> postfix(char *s)
+stack<long long > postfix(char *s)
 {
-    stack<int> S,O;
-    int f=0,a;
+    stack<long long > S,O;
+    long long f=0,a;
     O.push('N');
-    for(int i=0;i<strlen(s);i++)
+    for(long long i=0;i<strlen(s);i++)
     {
         if(s[i]>='0'&&s[i]<='9')
         {
@@ -77,9 +77,19 @@ stack<int> postfix(char *s)
                 if(O.top()=='(')
                     O.pop();   
             }
-            else if(isop(s[i]))
+            else if(isop(s[i])&&s[i]!='^')
             {
                 while(O.top()!='N'&&O.top()!='('&&prec(s[i])<=prec(O.top()))
+                {
+                    char c=O.top();
+                    O.pop();
+                    S.push(mapo(c));
+                }
+                O.push(s[i]);
+            }
+            else if(s[i]=='^')
+            {
+                while(O.top()!='N'&&O.top()!='('&&prec(s[i])<prec(O.top()))
                 {
                     char c=O.top();
                     O.pop();
@@ -98,7 +108,7 @@ stack<int> postfix(char *s)
     return S;
 }
 
-tree * newNode(int v)
+tree * newNode(long long v)
 {
     tree * temp=new tree;
     temp->left = NULL;
@@ -107,7 +117,7 @@ tree * newNode(int v)
     return temp; 
 }
 
-tree * etree(stack<int> s)
+tree * etree(stack<long long > s)
 {
     tree *t,*t1,*t2;
     //tree->parent=NULL;
@@ -127,9 +137,13 @@ tree * etree(stack<int> s)
             st.pop();
             t2=st.top();
             st.pop();
-
-            t->right=t1;
-            t->left=t2;
+            if(1)
+            {t->right=t1;
+            t->left=t2;}
+            // else {
+            //     t->right=t2;
+            //     t->left=t1;
+            // }
 
             st.push(t);
             s.pop();
@@ -139,11 +153,11 @@ tree * etree(stack<int> s)
 }
 
 
-void show(stack<int> s)
+void show(stack<long long > s)
 {
     while(!s.empty())
     {
-        int a=s.top();
+        long long a=s.top();
         s.pop();
         cout<<a<<endl;
     }
@@ -157,7 +171,7 @@ void printInorder(struct tree* node)
     /* first recur on left child */
     printInorder(node->left); 
   
-    /* then print the data of node */
+    /* then printthe data of node */
     cout << node->i << " "; 
   
     /* now recur on right child */
@@ -167,21 +181,21 @@ void printInorder(struct tree* node)
 
 
 
-int eval(tree* root)  
+long long eval(tree* root)  
 {  
     // empty tree  
     if (!root)  
         return 0;  
   
-    // leaf node i.e, an integer  
+    // leaf node i.e, an long long eger  
     if (!root->left && !root->right)  
         return root->i;  
   
     // Evaluate left subtree  
-    int l_val = eval(root->left);  
+    long long l_val = eval(root->left);  
   
     // Evaluate right subtree  
-    int r_val = eval(root->right);  
+    long long r_val = eval(root->right);  
   
     // Check which operator to apply  
     if (root->i==-1)  
@@ -198,21 +212,20 @@ int eval(tree* root)
     return pow(l_val,r_val);  
 }  
 
-
 int main()
 {   
-    int q;
+    long long q;
     cin>>q;
     while(q--)
     {
-        int T;
+        long long T;
         cin>>T;
         while(T--)
         {
             char s[100000];
             cin>>s;
             //scanf(" %[^\n]s",s);
-            stack <int> S,s1;
+            stack <long long > S,s1;
             S=postfix(s);
             while(!S.empty())
             {
