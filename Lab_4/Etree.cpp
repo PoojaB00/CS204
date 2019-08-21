@@ -240,7 +240,7 @@ int main()
 				u=1;
 			else u=0;
 		}
-		cout<<s;
+		//cout<<s;
 		
             stack <long long > S,s1;
             S=postfix(s);
