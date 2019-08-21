@@ -1,3 +1,4 @@
+
 #include<bits/stdc++.h>
 
 using namespace std;
@@ -16,18 +17,19 @@ long long prec(char c)
     return 2; 
     else if(c == '+' || c == '-') 
     return 1; 
-    else
+    else if(c=='$')
+	return 4;
     return -1; 
 } 
 
 bool isop(char c)
 {
-    if(c=='+'||c=='-'||c=='*'||c=='/'||c=='^')
+    if(c=='+'||c=='-'||c=='*'||c=='/'||c=='^'||c=='$')
     return true;
     return false;
 }
 
-long long mapo(char c)
+long long mapop(char c)
 {
     switch(c)
     {
@@ -36,15 +38,16 @@ long long mapo(char c)
         case '*': return -3;
         case '/': return -4;
         case '^': return -5;
+	case '$': return -2;
     }
 }
 
-stack<long long > postfix(char *s)
+stack<long long > postfix(string s)
 {
     stack<long long > S,O;
     long long f=0,a;
     O.push('N');
-    for(long long i=0;i<strlen(s);i++)
+    for(long long i=0;i<s.length();i++)
     {
         if(s[i]>='0'&&s[i]<='9')
         {
@@ -72,28 +75,28 @@ stack<long long > postfix(char *s)
                 {
                     char c=O.top();
                     O.pop();
-                    S.push(mapo(c));
+                    S.push(mapop(c));
                 }
                 if(O.top()=='(')
                     O.pop();   
             }
-            else if(isop(s[i])&&s[i]!='^')
+            else if(isop(s[i])&&s[i]!='^'&&s[i]!='$')
             {
                 while(O.top()!='N'&&O.top()!='('&&prec(s[i])<=prec(O.top()))
                 {
                     char c=O.top();
                     O.pop();
-                    S.push(mapo(c));
+                    S.push(mapop(c));
                 }
                 O.push(s[i]);
             }
-            else if(s[i]=='^')
+            else if(s[i]=='^'||s[i]=='$')
             {
                 while(O.top()!='N'&&O.top()!='('&&prec(s[i])<prec(O.top()))
                 {
                     char c=O.top();
                     O.pop();
-                    S.push(mapo(c));
+                    S.push(mapop(c));
                 }
                 O.push(s[i]);
             }
@@ -103,7 +106,7 @@ stack<long long > postfix(char *s)
         {
             char c=O.top();
             O.pop();
-            S.push(mapo(c));
+            S.push(mapop(c));
         }
     return S;
 }
@@ -222,9 +225,23 @@ int main()
         cin>>T;
         while(T--)
         {
-            char s[100000];
+		int u=1;
+            string s;
             cin>>s;
             //scanf(" %[^\n]s",s);
+		for(int i=0;i<s.length();i++)
+		{
+			if(u&&s[i]=='-')
+			{
+				s[i]='$';
+				s.insert(i,"0");
+			}
+			if(isop(s[i])||s[i]=='(')
+				u=1;
+			else u=0;
+		}
+		cout<<s;
+		
             stack <long long > S,s1;
             S=postfix(s);
             while(!S.empty())
