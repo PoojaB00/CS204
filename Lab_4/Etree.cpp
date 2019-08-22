@@ -208,11 +208,11 @@ int main()
 				u=1;
 			else u=0;
 		}
-        cout<<s;
+       // cout<<s;
             vector <long long > S;
 
             S=postfix(s);
-            show(S);
+            //show(S);
             tree *p=etree(S);
             cout<<eval(p)<<endl;
         }
