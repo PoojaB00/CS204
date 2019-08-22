@@ -1,4 +1,3 @@
-
 #include<bits/stdc++.h>
 
 using namespace std;
@@ -22,11 +21,13 @@ long long prec(char c)
     return -1; 
 } 
 
-bool isop(char c)
+int isop(char c)
 {
-    if(c=='+'||c=='-'||c=='*'||c=='/'||c=='^'||c=='$')
-    return true;
-    return false;
+    if(c=='+'||c=='-'||c=='*'||c=='/')
+    return 1;
+    if(c=='^'||c=='$')
+    return 2;
+    return 0;
 }
 
 long long mapop(char c)
@@ -38,13 +39,14 @@ long long mapop(char c)
         case '*': return -3;
         case '/': return -4;
         case '^': return -5;
-	case '$': return -2;
+	    case '$': return -2;
     }
 }
 
-stack<long long > postfix(string s)
+vector<long long > postfix(string s)
 {
-    stack<long long > S,O;
+    vector<long long > S;
+    stack<long long> O;
     long long f=0,a;
     O.push('N');
     for(long long i=0;i<s.length();i++)
@@ -53,13 +55,11 @@ stack<long long > postfix(string s)
         {
             if(f)
             {
-                a=S.top();
-                S.pop();
-                S.push(a*10+s[i]-'0');
+                S[i]=S[i]*10+s[i]-'0';
             }
             else 
             {
-                S.push(s[i]-'0');
+                S.push_back(s[i]-'0');
                 f=1;
             }
         }
@@ -75,28 +75,28 @@ stack<long long > postfix(string s)
                 {
                     char c=O.top();
                     O.pop();
-                    S.push(mapop(c));
+                    S.push_back(mapop(c));
                 }
                 if(O.top()=='(')
                     O.pop();   
             }
-            else if(isop(s[i])&&s[i]!='^'&&s[i]!='$')
+            else if(isop(s[i])==1)
             {
                 while(O.top()!='N'&&O.top()!='('&&prec(s[i])<=prec(O.top()))
                 {
                     char c=O.top();
                     O.pop();
-                    S.push(mapop(c));
+                    S.push_back(mapop(c));
                 }
                 O.push(s[i]);
             }
-            else if(s[i]=='^'||s[i]=='$')
+            else if(isop(s[i])==2)
             {
                 while(O.top()!='N'&&O.top()!='('&&prec(s[i])<prec(O.top()))
                 {
                     char c=O.top();
                     O.pop();
-                    S.push(mapop(c));
+                    S.push_back(mapop(c));
                 }
                 O.push(s[i]);
             }
@@ -106,7 +106,7 @@ stack<long long > postfix(string s)
         {
             char c=O.top();
             O.pop();
-            S.push(mapop(c));
+            S.push_back(mapop(c));
         }
     return S;
 }
@@ -120,22 +120,20 @@ tree * newNode(long long v)
     return temp; 
 }
 
-tree * etree(stack<long long > s)
+tree * etree(vector<long long > v)
 {
     tree *t,*t1,*t2;
-    //tree->parent=NULL;
     stack<tree *> st;
-    while(!s.empty())
+    for(int i=0;i<v.size();i++)
     {
-        if(s.top()>=0)
+        if(v[i]>=0)
         {
-            t=newNode(s.top());
-            s.pop();
+            t=newNode(v[i]);
             st.push(t);
         }
         else
         {
-            t=newNode(s.top());
+            t=newNode(v[i]);
             t1=st.top();
             st.pop();
             t2=st.top();
@@ -143,13 +141,7 @@ tree * etree(stack<long long > s)
             if(1)
             {t->right=t1;
             t->left=t2;}
-            // else {
-            //     t->right=t2;
-            //     t->left=t1;
-            // }
-
             st.push(t);
-            s.pop();
         }
     }
     return t;
@@ -170,46 +162,25 @@ void printInorder(struct tree* node)
 { 
     if (node == NULL) 
         return; 
-  
-    /* first recur on left child */
     printInorder(node->left); 
-  
-    /* then printthe data of node */
     cout << node->i << " "; 
-  
-    /* now recur on right child */
     printInorder(node->right); 
 } 
 
-
-
-
 long long eval(tree* root)  
 {  
-    // empty tree  
     if (!root)  
         return 0;  
-  
-    // leaf node i.e, an long long eger  
     if (!root->left && !root->right)  
         return root->i;  
-  
-    // Evaluate left subtree  
     long long l_val = eval(root->left);  
-  
-    // Evaluate right subtree  
     long long r_val = eval(root->right);  
-  
-    // Check which operator to apply  
     if (root->i==-1)  
         return l_val+r_val;  
-  
     if (root->i==-2)  
         return l_val-r_val;  
-  
     if (root->i==-3)  
         return l_val*r_val;  
-
     if(root->i==-4)
         return l_val/r_val;
     return pow(l_val,r_val);  
@@ -225,10 +196,9 @@ int main()
         cin>>T;
         while(T--)
         {
-		int u=1;
+		    int u=1;
             string s;
             cin>>s;
-            //scanf(" %[^\n]s",s);
 		for(int i=0;i<s.length();i++)
 		{
 			if(u&&s[i]=='-')
@@ -240,21 +210,10 @@ int main()
 				u=1;
 			else u=0;
 		}
-		//cout<<s;
-		
-            stack <long long > S,s1;
+            vector <long long > S;
             S=postfix(s);
-            while(!S.empty())
-            {
-                s1.push(S.top());
-                S.pop();
-            }
-            //show(s1);
-            tree *p=etree(s1);
-            //printInorder(p);
-            //cout<<endl;
+            tree *p=etree(S);
             cout<<eval(p)<<endl;
-            //cout<<evaluate(t)<<endl;
         }
     }
 }
