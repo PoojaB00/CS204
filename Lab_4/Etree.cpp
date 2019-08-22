@@ -55,7 +55,7 @@ vector<long long > postfix(string s)
         {
             if(f)
             {
-                S[i]=S[i]*10+s[i]-'0';
+                S[S.size()-1]=S[S.size()-1]*10+s[i]-'0';
             }
             else 
             {
@@ -148,13 +148,11 @@ tree * etree(vector<long long > v)
 }
 
 
-void show(stack<long long > s)
+void show(vector<long long > s)
 {
-    while(!s.empty())
+    for(int i=0;i<s.size();i++)
     {
-        long long a=s.top();
-        s.pop();
-        cout<<a<<endl;
+        cout<<s[i]<<' ';
     }
 }
 
@@ -210,8 +208,11 @@ int main()
 				u=1;
 			else u=0;
 		}
+        cout<<s;
             vector <long long > S;
+
             S=postfix(s);
+            show(S);
             tree *p=etree(S);
             cout<<eval(p)<<endl;
         }
