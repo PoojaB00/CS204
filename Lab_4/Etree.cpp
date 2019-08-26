@@ -21,7 +21,7 @@ long long prec(char c)
     return -1; 
 } 
 
-int isop(char c)
+long long isop(char c)
 {
     if(c=='+'||c=='-'||c=='*'||c=='/')
     return 1;
@@ -41,6 +41,7 @@ long long mapop(char c)
         case '^': return -5;
 	    case '$': return -2;
     }
+	return 0;
 }
 
 vector<long long > postfix(string s)
@@ -124,7 +125,7 @@ tree * etree(vector<long long > v)
 {
     tree *t,*t1,*t2;
     stack<tree *> st;
-    for(int i=0;i<v.size();i++)
+    for(long long i=0;i<v.size();i++)
     {
         if(v[i]>=0)
         {
@@ -150,7 +151,7 @@ tree * etree(vector<long long > v)
 
 void show(vector<long long > s)
 {
-    for(int i=0;i<s.size();i++)
+    for(long long i=0;i<s.size();i++)
     {
         cout<<s[i]<<' ';
     }
@@ -182,7 +183,103 @@ long long eval(tree* root)
     if(root->i==-4)
         return l_val/r_val;
     return pow(l_val,r_val);  
-}  
+} 
+
+int idno(char c)
+{
+	if(isupper(c))
+		return c-'A';
+	return c-'a';
+}
+
+long long value(string s)
+{
+	vector <long long > S;
+    S=postfix(s);
+    //cout<<1;
+    //show(S);
+	tree *p=etree(S);
+	//	cout<<2;
+	return eval(p);
+}
+
+void process(string s,map<string,long long> *M)
+{
+    string s1="";
+    vector<long long> dl;
+    long long u=1;
+    dl.push_back(-1);
+    for(long long i=0;i<s.length();i++)
+    {
+        if(u&&s[i]=='-')
+        {
+            s[i]='$';
+            s.insert(i,"0");
+        }
+        if(isop(s[i])||s[i]=='(')
+            u=1;
+        else u=0;
+        if(isop(s[i])||s[i]=='('||s[i]==')'||s[i]=='=')
+        {
+            dl.push_back(i);
+        }
+    }
+    dl.push_back(s.length());
+    // for(int i=0;i<dl.size();i++)
+    //     cout<<dl[i]<<' ';
+    // cout<<endl;
+    string t,v="";
+    //cout<<s.size();
+    if(s[dl[1]]=='=')
+    {
+        v=s.substr(dl[0]+1,dl[1]-dl[0]-1);
+        dl[0]=dl[1];
+        dl.erase(dl.begin()+1);
+    }
+    for(int i=0;i<dl.size()-1;i++) 
+    {
+        t=s.substr(dl[i]+1,dl[i+1]-dl[i]-1);
+        if(!t.size())
+            {
+                s1+=s[dl[i+1]];
+                continue;
+            }
+        if(isdigit(t[0]))
+        {
+            s1+=t;
+        }
+        else
+        {
+            auto itr=M->find(t);
+            if(itr==M->end())
+            {
+                cout<<"CANT BE EVALUATED"<<endl;
+                return;
+            }
+            else
+            {
+                s1+=to_string(itr->second);
+            }
+        }
+        if(i+1<dl.size())
+        {
+            s1+=s[dl[i+1]];
+        }
+    }
+    if(v.length())
+    {
+        auto itr=M->find(v);
+        if(itr==M->end())
+        {
+            M->insert({v,value(s1)});
+        }
+        else itr->second=value(s1);
+    }
+    else
+    {
+        cout<<value(s1)<<endl;
+    }
+}
 
 int main()
 {   
@@ -192,29 +289,13 @@ int main()
     {
         long long T;
         cin>>T;
+		map<string,long long> M;
         while(T--)
         {
-		    int u=1;
+		long long u=1;
             string s;
             cin>>s;
-		for(int i=0;i<s.length();i++)
-		{
-			if(u&&s[i]=='-')
-			{
-				s[i]='$';
-				s.insert(i,"0");
-			}
-			if(isop(s[i])||s[i]=='(')
-				u=1;
-			else u=0;
-		}
-       // cout<<s;
-            vector <long long > S;
-
-            S=postfix(s);
-            //show(S);
-            tree *p=etree(S);
-            cout<<eval(p)<<endl;
+	process(s,&M);
         }
     }
 }
