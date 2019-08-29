@@ -17,7 +17,7 @@ long long prec(char c)
     else if(c == '+' || c == '-') 
     return 1; 
     else if(c=='$')
-	return 4;
+    return 4;
     return -1; 
 } 
 
@@ -39,9 +39,9 @@ long long mapop(char c)
         case '*': return -3;
         case '/': return -4;
         case '^': return -5;
-	    case '$': return -2;
+        case '$': return -2;
     }
-	return 0;
+    return 0;
 }
 
 vector<long long > postfix(string s)
@@ -187,23 +187,33 @@ long long eval(tree* root)
 
 int idno(char c)
 {
-	if(isupper(c))
-		return c-'A';
-	return c-'a';
+    if(isupper(c))
+        return c-'A';
+    return c-'a';
 }
 
 long long value(string s)
 {
-	vector <long long > S;
+    vector <long long > S;
     S=postfix(s);
     //cout<<1;
     //show(S);
-	tree *p=etree(S);
-	//	cout<<2;
-	return eval(p);
+    tree *p=etree(S);
+    //  cout<<2;
+    return eval(p);
 }
 
-void process(string s,map<string,long long> *M)
+long long find(vector<string> *M,string s)
+{
+    for(int i=0;i<M->size();i++)
+    {
+        if(!s.compare((*M)[i]))
+            return i;
+    }
+    return M->size();
+}
+
+void process(string s,vector<string> *M, vector<long long> *N)
 {
     string s1="";
     vector<long long> dl;
@@ -216,7 +226,7 @@ void process(string s,map<string,long long> *M)
             s[i]='$';
             s.insert(i,"0");
         }
-        if(isop(s[i])||s[i]=='(')
+        if(isop(s[i])||s[i]=='('||s[i]=='=')
             u=1;
         else u=0;
         if(isop(s[i])||s[i]=='('||s[i]==')'||s[i]=='=')
@@ -250,15 +260,18 @@ void process(string s,map<string,long long> *M)
         }
         else
         {
-            auto itr=M->find(t);
-            if(itr==M->end())
+            long long i=find(M,t);
+            if(i==M->size())
             {
                 cout<<"CANT BE EVALUATED"<<endl;
                 return;
             }
             else
             {
-                s1+=to_string(itr->second);
+                string p=to_string((*N)[i]);
+                if(p[0]=='-')
+                    p="0$"+p.substr(1);
+                s1+=p;
             }
         }
         if(i+1<dl.size())
@@ -266,14 +279,18 @@ void process(string s,map<string,long long> *M)
             s1+=s[dl[i+1]];
         }
     }
+    //cout<<s1<<'i'<<endl;
+    //cout<<1;
     if(v.length())
     {
-        auto itr=M->find(v);
-        if(itr==M->end())
+        long long i=find(M,v);
+        if(i==M->size())
         {
-            M->insert({v,value(s1)});
+            M->push_back(v);
+            N->push_back(value(s1));
         }
-        else itr->second=value(s1);
+        else (*N)[i]=value(s1);
+
     }
     else
     {
@@ -289,13 +306,15 @@ int main()
     {
         long long T;
         cin>>T;
-		map<string,long long> M;
+        vector<string> M;
+        vector<long long> N;
         while(T--)
         {
-		long long u=1;
+            long long u=1;
             string s;
             cin>>s;
-	process(s,&M);
+            process(s,&M,&N);
         }
     }
+	return 0;
 }
