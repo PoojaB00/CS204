@@ -21,7 +21,7 @@ void bfs(int y, vector<vector<int>> e)
                 if(v[e[x][i]])
                 {
                     Q.push(e[x][i]);
-                    v[y]=0;
+                    v[e[x][i]]=0;
                 }
             }
             cout<<x+1<<' ';
